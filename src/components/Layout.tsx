@@ -1,0 +1,70 @@
+import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+
+export function Layout() {
+  const location = useLocation()
+  const [isAddOpen, setIsAddOpen] = useState(false)
+
+  return (
+    <div className="flex h-full flex-col">
+      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur">
+        <div className="mx-auto w-full max-w-screen-sm px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="text-base font-semibold">Movie Organizer</div>
+            <div className="text-sm text-gray-500">PWA</div>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-screen-sm flex-1 overflow-auto">
+        <Outlet />
+      </main>
+
+      <button
+        className="fixed bottom-20 right-6 z-20 inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300"
+        aria-label="Добавить"
+        onClick={() => setIsAddOpen(true)}
+      >
+        +
+      </button>
+
+      {isAddOpen && (
+        <div className="fixed inset-0 z-30 flex items-end justify-center sm:items-center">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setIsAddOpen(false)} />
+          <div className="z-40 w-full max-w-screen-sm rounded-t-2xl bg-white p-4 shadow-lg sm:rounded-2xl">
+            <div className="mb-3 text-lg font-semibold">Добавить фильм</div>
+            <div className="space-y-3">
+              <input className="w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Название" />
+              <div className="flex justify-end gap-2">
+                <button className="rounded-lg px-4 py-2 text-gray-600" onClick={() => setIsAddOpen(false)}>Отмена</button>
+                <button className="rounded-lg bg-indigo-600 px-4 py-2 text-white">Сохранить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <nav className="sticky bottom-0 z-10 border-t border-gray-200 bg-white/80 backdrop-blur">
+        <div className="mx-auto grid w-full max-w-screen-sm grid-cols-4 text-sm">
+          <TabLink to="/" label="Главная" current={location.pathname === '/'} />
+          <TabLink to="/search" label="Поиск" current={location.pathname.startsWith('/search')} />
+          <TabLink to="/library" label="Библиотека" current={location.pathname.startsWith('/library')} />
+          <TabLink to="/stats" label="Статистика" current={location.pathname.startsWith('/stats')} />
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+function TabLink({ to, label, current }: { to: string; label: string; current: boolean }) {
+  return (
+    <NavLink
+      to={to}
+      className={`flex items-center justify-center gap-1 px-2 py-3 ${current ? 'text-indigo-600' : 'text-gray-600'}`}
+    >
+      <span>{label}</span>
+    </NavLink>
+  )
+}
+
+
