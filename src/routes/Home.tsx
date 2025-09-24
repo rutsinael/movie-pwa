@@ -1,14 +1,24 @@
+import { useMemo } from 'react'
+import { useMovies } from '../store/movies'
+
 export function Home() {
+  const { movies } = useMovies()
+  const counts = useMemo(() => {
+    const toWatch = movies.filter((m) => m.status === 'to_watch').length
+    const watched = movies.filter((m) => m.status === 'watched').length
+    return { toWatch, watched }
+  }, [movies])
+
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-semibold">Главная</h1>
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-gray-100 p-4 text-center">
-          <div className="text-2xl font-bold">0</div>
+          <div className="text-2xl font-bold">{counts.toWatch}</div>
           <div className="text-sm text-gray-600">Хочу</div>
         </div>
         <div className="rounded-xl bg-gray-100 p-4 text-center">
-          <div className="text-2xl font-bold">0</div>
+          <div className="text-2xl font-bold">{counts.watched}</div>
           <div className="text-sm text-gray-600">Просмотрено</div>
         </div>
       </div>

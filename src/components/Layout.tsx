@@ -1,9 +1,16 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useMovies } from '../store/movies'
 
 export function Layout() {
   const location = useLocation()
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [title, setTitle] = useState('')
+  const { loadMovies, addMovie } = useMovies()
+
+  useEffect(() => {
+    loadMovies()
+  }, [loadMovies])
 
   return (
     <div className="flex h-full flex-col">
@@ -34,10 +41,27 @@ export function Layout() {
           <div className="z-40 w-full max-w-screen-sm rounded-t-2xl bg-white p-4 shadow-lg sm:rounded-2xl">
             <div className="mb-3 text-lg font-semibold">Добавить фильм</div>
             <div className="space-y-3">
-              <input className="w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Название" />
+              <input
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                placeholder="Название"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
               <div className="flex justify-end gap-2">
                 <button className="rounded-lg px-4 py-2 text-gray-600" onClick={() => setIsAddOpen(false)}>Отмена</button>
-                <button className="rounded-lg bg-indigo-600 px-4 py-2 text-white">Сохранить</button>
+                <button
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-white disabled:opacity-50"
+                  disabled={!title.trim()}
+                  onClick={async () => {
+                    const saved = await addMovie({ title: title.trim(), status: 'to_watch' })
+                    if (saved) {
+                      setTitle('')
+                      setIsAddOpen(false)
+                    }
+                  }}
+                >
+                  Сохранить
+                </button>
               </div>
             </div>
           </div>
