@@ -1,17 +1,24 @@
 import { useMemo, useState } from 'react'
 import { useMovies } from '../store/movies'
 import { getAISuggestions, type AISuggestion } from '../lib/ai'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { useToast } from '../components/Toast'
 
 export function Home() {
   const { movies } = useMovies()
   const [aiLoading, setAiLoading] = useState(false)
   const [aiItems, setAiItems] = useState<AISuggestion[]>([])
   const [aiNote, setAiNote] = useState('')
+  const toast = useToast()
   const counts = useMemo(() => {
     const toWatch = movies.filter((m) => m.status === 'to_watch').length
     const watched = movies.filter((m) => m.status === 'watched').length
     return { toWatch, watched }
   }, [movies])
+
+  usePullToRefresh(() => {
+    toast.show('Обновлено')
+  })
 
   return (
     <div className="p-4 space-y-4">

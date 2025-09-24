@@ -1,11 +1,21 @@
 import { useMovies } from '../store/movies'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { pullMovies, pushMovies } from '../sync'
+import { useToast } from '../components/Toast'
 
 export function Library() {
   const { movies, updateMovie, deleteMovie } = useMovies()
   const [roomKey, setRoomKey] = useState('')
   const [syncing, setSyncing] = useState(false)
+  const toast = useToast()
+
+  useEffect(() => {
+    const saved = localStorage.getItem('roomKey')
+    if (saved) setRoomKey(saved)
+  }, [])
+  useEffect(() => {
+    localStorage.setItem('roomKey', roomKey)
+  }, [roomKey])
 
   return (
     <div className="p-4 space-y-4">
@@ -25,6 +35,7 @@ export function Library() {
             try {
               await pushMovies(roomKey.trim())
               await pullMovies(roomKey.trim())
+              toast.show('Синхронизация завершена')
             } finally {
               setSyncing(false)
             }
@@ -55,7 +66,12 @@ export function Library() {
                 </button>
                 <button
                   className="rounded bg-red-50 px-3 py-1 text-sm text-red-600"
-                  onClick={() => deleteMovie(m.id!)}
+                  onClick={() => {
+                    if (confirm(`Удалить «${m.title}»?`)) {
+                      deleteMovie(m.id!)
+                      toast.show('Удалено')
+                    }
+                  }}
                 >
                   Удалить
                 </button>
