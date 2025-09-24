@@ -1,11 +1,39 @@
 import { useMovies } from '../store/movies'
+import { useState } from 'react'
+import { pullMovies, pushMovies } from '../sync'
 
 export function Library() {
   const { movies, updateMovie, deleteMovie } = useMovies()
+  const [roomKey, setRoomKey] = useState('')
+  const [syncing, setSyncing] = useState(false)
 
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-semibold">Библиотека</h1>
+      <div className="flex items-end gap-2">
+        <input
+          className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+          placeholder="roomKey для синхронизации"
+          value={roomKey}
+          onChange={(e) => setRoomKey(e.target.value)}
+        />
+        <button
+          className="rounded bg-indigo-600 px-3 py-2 text-white disabled:opacity-50"
+          disabled={!roomKey.trim() || syncing}
+          onClick={async () => {
+            setSyncing(true)
+            try {
+              await pushMovies(roomKey.trim())
+              await pullMovies(roomKey.trim())
+            } finally {
+              setSyncing(false)
+            }
+          }}
+        >
+          {syncing ? 'Синхронизация…' : 'Синхронизировать'}
+        </button>
+      </div>
+
       {movies.length === 0 ? (
         <div className="text-sm text-gray-500">Ваши фильмы появятся здесь</div>
       ) : (

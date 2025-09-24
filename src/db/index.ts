@@ -9,6 +9,16 @@ class MovieDB extends Dexie {
     this.version(1).stores({
       movies: '++id, status, aiTip, createdAt, updatedAt, title',
     })
+    this.version(2).upgrade((tx) =>
+      tx.table('movies').toCollection().modify((m: any) => {
+        if (!m.uuid) {
+          m.uuid = crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
+        }
+      })
+    )
+    this.version(2).stores({
+      movies: '++id, uuid, status, aiTip, createdAt, updatedAt, title',
+    })
   }
 }
 

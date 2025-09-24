@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { db } from '../db'
 import type { MovieEntity, NewMovieInput } from '../types'
+import { generateUuid } from '../lib/uuid'
 
 interface MoviesState {
   movies: MovieEntity[]
@@ -28,6 +29,7 @@ export const useMovies = create<MoviesState>((set, get) => ({
   addMovie: async (input) => {
     const now = new Date().toISOString()
     const entity: MovieEntity = {
+      uuid: generateUuid(),
       title: input.title.trim(),
       status: input.status ?? 'to_watch',
       aiTip: input.aiTip ?? false,

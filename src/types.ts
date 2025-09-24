@@ -2,6 +2,7 @@ export type MovieStatus = 'to_watch' | 'watched'
 
 export interface MovieEntity {
   id?: number
+  uuid: string
   title: string
   status: MovieStatus
   aiTip: boolean
