@@ -1,8 +1,12 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useMovies } from '../store/movies'
+import { getAISuggestions, type AISuggestion } from '../lib/ai'
 
 export function Home() {
   const { movies } = useMovies()
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiItems, setAiItems] = useState<AISuggestion[]>([])
+  const [aiNote, setAiNote] = useState('')
   const counts = useMemo(() => {
     const toWatch = movies.filter((m) => m.status === 'to_watch').length
     const watched = movies.filter((m) => m.status === 'watched').length
@@ -23,6 +27,42 @@ export function Home() {
         </div>
       </div>
       <button className="w-full rounded-lg bg-indigo-600 text-white py-3">🎲 Случайный фильм</button>
+
+      <div className="space-y-2">
+        <div className="text-base font-semibold">ИИ‑подборка</div>
+        <button
+          className="rounded-lg bg-gray-900 text-white px-4 py-2 disabled:opacity-50"
+          disabled={aiLoading}
+          onClick={async () => {
+            setAiLoading(true)
+            try {
+              const payload = {
+                preferences: '',
+                movies: movies.map((m) => ({ title: m.title, status: m.status })),
+              }
+              const res = await getAISuggestions(payload)
+              setAiItems(res.suggestions)
+              setAiNote(res.note)
+            } catch {
+              setAiItems([])
+              setAiNote('')
+            } finally {
+              setAiLoading(false)
+            }
+          }}
+        >
+          {aiLoading ? 'Загрузка…' : 'Получить подборку'}
+        </button>
+        {aiNote && <div className="text-sm text-gray-600">{aiNote}</div>}
+        <ul className="space-y-2">
+          {aiItems.map((s, i) => (
+            <li key={i} className="rounded-lg border border-gray-200 p-3">
+              <div className="font-medium">{s.title}</div>
+              <div className="text-xs text-gray-500">{s.reason}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
