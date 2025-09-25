@@ -11,6 +11,7 @@ export function Home() {
   const [aiItems, setAiItems] = useState<AISuggestion[]>([])
   const [aiNote, setAiNote] = useState('')
   const toast = useToast()
+  const [randomPoster, setRandomPoster] = useState<{ title: string; posterUrl: string | null } | null>(null)
   const counts = useMemo(() => {
     const toWatch = movies.filter((m) => m.status === 'to_watch').length
     const watched = movies.filter((m) => m.status === 'watched').length
@@ -54,12 +55,25 @@ export function Home() {
             const pool = movies.filter((m) => m.status === 'to_watch')
             if (pool.length === 0) return
             const pick = weightedRandomPick(pool)
-            if (pick) toast.show(`Случайный выбор: ${pick.title}`)
+            if (pick) {
+              setRandomPoster({ title: pick.title, posterUrl: pick.posterUrl ?? null })
+            }
           }}
         >
           🧮 🎲 Случайный фильм
         </button>
-        <div className="mt-2 text-center text-sm text-gray-600">Добавьте фильмы в список, чтобы получить случайный выбор</div>
+        {randomPoster ? (
+          <div className="mt-3 flex items-center gap-3">
+            {randomPoster.posterUrl ? (
+              <img src={randomPoster.posterUrl} alt={randomPoster.title} className="h-20 w-14 rounded object-cover" />
+            ) : (
+              <div className="h-20 w-14 rounded bg-white/70" />
+            )}
+            <div className="font-medium">{randomPoster.title}</div>
+          </div>
+        ) : (
+          <div className="mt-2 text-center text-sm text-gray-600">Добавьте фильмы в список, чтобы получить случайный выбор</div>
+        )}
       </div>
 
       <div className="flex gap-2">
