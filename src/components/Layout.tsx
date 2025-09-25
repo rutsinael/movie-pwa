@@ -1,9 +1,10 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useMovies } from '../store/movies'
 
 export function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [title, setTitle] = useState('')
   const { loadMovies, addMovie } = useMovies()
@@ -16,9 +17,8 @@ export function Layout() {
     <div className="flex h-full flex-col">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur">
         <div className="mx-auto w-full max-w-screen-sm px-4 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center">
             <div className="text-base font-semibold">Movie Organizer</div>
-            <div className="text-sm text-gray-500">PWA</div>
           </div>
         </div>
       </header>
@@ -29,8 +29,8 @@ export function Layout() {
 
       <button
         className="fixed bottom-20 right-6 z-20 inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300"
-        aria-label="Добавить"
-        onClick={() => setIsAddOpen(true)}
+        aria-label="Поиск"
+        onClick={() => navigate('/search', { state: { focusSearch: true } })}
       >
         +
       </button>

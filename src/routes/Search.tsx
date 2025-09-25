@@ -1,12 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { searchMovies, type TMDBMovieBrief } from '../lib/api'
 import { useMovies } from '../store/movies'
+import { useLocation } from 'react-router-dom'
+import { useToast } from '../components/Toast'
 
 export function Search() {
   const [q, setQ] = useState('')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<TMDBMovieBrief[]>([])
   const { addMovie } = useMovies()
+  const location = useLocation() as { state?: { focusSearch?: boolean } }
+  const toast = useToast()
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (location.state?.focusSearch) {
+      setTimeout(() => inputRef.current?.focus(), 0)
+    }
+  }, [location.state])
 
   const debounced = useDebouncedValue(q, 350)
 
@@ -37,6 +48,7 @@ export function Search() {
         className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         placeholder="Найдите фильм..."
         value={q}
+        ref={inputRef}
         onChange={(e) => setQ(e.target.value)}
       />
       {loading && <div className="text-sm text-gray-500">Загрузка…</div>}
@@ -57,7 +69,10 @@ export function Search() {
               <div className="mt-2">
                 <button
                   className="rounded bg-indigo-600 px-3 py-1 text-sm text-white"
-                  onClick={() => addMovie({ title: m.title, status: 'to_watch' })}
+                  onClick={async () => {
+                    const saved = await addMovie({ title: m.title, status: 'to_watch' })
+                    if (saved) toast.show('Добавлено в библиотеку')
+                  }}
                 >
                   Добавить
                 </button>

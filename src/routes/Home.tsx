@@ -33,7 +33,17 @@ export function Home() {
           <div className="text-sm text-gray-600">Просмотрено</div>
         </div>
       </div>
-      <button className="w-full rounded-lg bg-indigo-600 text-white py-3">🎲 Случайный фильм</button>
+      <button
+        className="w-full rounded-lg bg-indigo-600 text-white py-3"
+        onClick={() => {
+          const pool = movies.filter((m) => m.status === 'to_watch')
+          if (pool.length === 0) return
+          const pick = pool[Math.floor(Math.random() * pool.length)]
+          toast.show(`Случайный выбор: ${pick.title}`)
+        }}
+      >
+        🎲 Случайный фильм
+      </button>
 
       <div className="space-y-2">
         <div className="text-base font-semibold">ИИ‑подборка</div>
