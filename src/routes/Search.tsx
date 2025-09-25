@@ -43,16 +43,28 @@ export function Search() {
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Поиск</h1>
-      <input
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        placeholder="Найдите фильм..."
-        value={q}
-        ref={inputRef}
-        onChange={(e) => setQ(e.target.value)}
-      />
+      <h1 className="text-2xl font-bold">Поиск фильмов</h1>
+      <div className="flex gap-2">
+        <input
+          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Введите название фильма..."
+          value={q}
+          ref={inputRef}
+          onChange={(e) => setQ(e.target.value)}
+        />
+        <button
+          className="rounded-lg bg-indigo-600 px-4 text-white"
+          onClick={() => setQ((v) => v.trim())}
+        >
+          🔍
+        </button>
+      </div>
       {!loading && results.length === 0 && q.trim() === '' && (
-        <div className="text-sm text-gray-500">Введите запрос, чтобы увидеть результаты</div>
+        <div className="rounded-xl border border-gray-200 p-6 text-center text-gray-600">
+          <div className="text-5xl mb-2">🎬</div>
+          <div className="font-medium">Найдите фильмы</div>
+          <div className="text-sm">Введите название фильма в поисковую строку</div>
+        </div>
       )}
       {!loading && results.length === 0 && q.trim() !== '' && (
         <div className="text-sm text-gray-500">Ничего не найдено</div>

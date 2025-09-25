@@ -23,28 +23,56 @@ export function Home() {
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Главная</h1>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-gray-100 p-4 text-center">
+      <div className="relative">
+        <input
+          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="Найти фильм..."
+          readOnly
+          onClick={() => window.location.assign('/search')}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl bg-yellow-50 p-4 text-center border border-yellow-100">
+          <div className="text-sm text-gray-600">К просмотру</div>
           <div className="text-2xl font-bold">{counts.toWatch}</div>
-          <div className="text-sm text-gray-600">Хочу</div>
         </div>
-        <div className="rounded-xl bg-gray-100 p-4 text-center">
-          <div className="text-2xl font-bold">{counts.watched}</div>
+        <div className="rounded-xl bg-green-50 p-4 text-center border border-green-100">
           <div className="text-sm text-gray-600">Просмотрено</div>
+          <div className="text-2xl font-bold">{counts.watched}</div>
+        </div>
+        <div className="rounded-xl bg-purple-50 p-4 text-center border border-purple-100">
+          <div className="text-sm text-gray-600">ИИ советы</div>
+          <div className="text-2xl font-bold">0</div>
         </div>
       </div>
-      <button
-        className="w-full rounded-lg bg-indigo-600 text-white py-3"
-        onClick={() => {
-          const pool = movies.filter((m) => m.status === 'to_watch')
-          if (pool.length === 0) return
-          const pick = weightedRandomPick(pool)
-          if (pick) toast.show(`Случайный выбор: ${pick.title}`)
-        }}
-      >
-        🎲 Случайный фильм
-      </button>
+
+      <div className="rounded-xl border border-gray-200 bg-blue-50 p-4">
+        <button
+          className="w-full rounded-lg bg-blue-600 text-white py-3"
+          onClick={() => {
+            const pool = movies.filter((m) => m.status === 'to_watch')
+            if (pool.length === 0) return
+            const pick = weightedRandomPick(pool)
+            if (pick) toast.show(`Случайный выбор: ${pick.title}`)
+          }}
+        >
+          🧮 🎲 Случайный фильм
+        </button>
+        <div className="mt-2 text-center text-sm text-gray-600">Добавьте фильмы в список, чтобы получить случайный выбор</div>
+      </div>
+
+      <div className="flex gap-2">
+        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">📝 Хочу посмотреть</button>
+        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">✅ Просмотрено</button>
+        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">🤖 ИИ</button>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 p-6 text-center">
+        <div className="text-5xl mb-2">✅</div>
+        <div className="text-lg font-semibold">Ничего не просмотрено</div>
+        <div className="text-sm text-gray-600">Отметьте фильмы как просмотренные, чтобы получить рекомендации</div>
+      </div>
 
       <div className="space-y-2">
         <div className="text-base font-semibold">ИИ‑подборка</div>

@@ -17,8 +17,14 @@ export function Layout() {
     <div className="flex h-full flex-col">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur">
         <div className="mx-auto w-full max-w-screen-sm px-4 py-3">
-          <div className="flex items-center justify-center">
-            <div className="text-base font-semibold">Movie Organizer</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-indigo-100 text-indigo-700 grid place-items-center">🎬</div>
+              <div className="text-base font-semibold">Movie Organizer</div>
+            </div>
+            <button className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 grid place-items-center" aria-label="Профиль">
+              ⚙️
+            </button>
           </div>
         </div>
       </header>

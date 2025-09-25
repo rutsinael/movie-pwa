@@ -19,7 +19,28 @@ export function Library() {
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Библиотека</h1>
+      <h1 className="text-2xl font-bold">Библиотека</h1>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
+          <div className="text-sm text-gray-600">К просмотру</div>
+          <div className="text-2xl font-bold">{movies.filter(m=>m.status==='to_watch').length}</div>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
+          <div className="text-sm text-gray-600">Просмотрено</div>
+          <div className="text-2xl font-bold">{movies.filter(m=>m.status==='watched').length}</div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <input className="flex-1 rounded-lg border border-gray-300 px-3 py-2" placeholder="Поиск в библиотеке..." />
+        <div className="flex gap-2">
+          <select className="rounded-lg border border-gray-300 px-2 py-2">
+            <option>Все фильмы</option>
+          </select>
+          <select className="rounded-lg border border-gray-300 px-2 py-2">
+            <option>По дате добавления</option>
+          </select>
+        </div>
+      </div>
       <div className="flex items-end gap-2">
         <input
           className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
@@ -46,7 +67,11 @@ export function Library() {
       </div>
 
       {movies.length === 0 ? (
-        <div className="text-sm text-gray-500">Ваши фильмы появятся здесь</div>
+        <div className="rounded-xl border border-gray-200 p-6 text-center">
+          <div className="text-5xl mb-2">📚</div>
+          <div className="text-lg font-semibold">Библиотека пуста</div>
+          <div className="text-sm text-gray-600">Добавьте фильмы в свою коллекцию</div>
+        </div>
       ) : (
         <ul className="space-y-2">
           {movies.map((m) => (
