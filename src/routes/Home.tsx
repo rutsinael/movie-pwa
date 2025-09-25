@@ -3,6 +3,7 @@ import { useMovies } from '../store/movies'
 import { getAISuggestions, type AISuggestion } from '../lib/ai'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { useToast } from '../components/Toast'
+import { weightedRandomPick } from '../lib/random'
 
 export function Home() {
   const { movies } = useMovies()
@@ -38,8 +39,8 @@ export function Home() {
         onClick={() => {
           const pool = movies.filter((m) => m.status === 'to_watch')
           if (pool.length === 0) return
-          const pick = pool[Math.floor(Math.random() * pool.length)]
-          toast.show(`Случайный выбор: ${pick.title}`)
+          const pick = weightedRandomPick(pool)
+          if (pick) toast.show(`Случайный выбор: ${pick.title}`)
         }}
       >
         🎲 Случайный фильм

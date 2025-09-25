@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-screen-sm flex-col items-center gap-2 px-4">
+      <div className="pointer-events-none fixed inset-x-0 top-4 z-50 mx-auto flex w-full max-w-screen-sm flex-col items-center gap-2 px-4" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         {items.map((t) => (
           <div key={t.id} className="pointer-events-auto w-full rounded-lg bg-gray-900/90 px-4 py-2 text-white shadow-lg">
             {t.message}
