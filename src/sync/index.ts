@@ -31,7 +31,7 @@ export async function pullMovies(roomKey: string) {
     if (!existing) {
       await db.movies.add(m)
     } else if (existing.updatedAt < m.updatedAt) {
-      await db.movies.update(existing.id!, m)
+      await db.movies.put({ ...m, id: existing.id })
     }
   }
 }

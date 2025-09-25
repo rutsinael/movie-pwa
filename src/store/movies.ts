@@ -53,7 +53,7 @@ export const useMovies = create<MoviesState>((set, get) => ({
       ...patch,
       updatedAt: new Date().toISOString(),
     }
-    await db.movies.update(id, updated)
+    await db.movies.put(updated)
     const next = [...current]
     next[idx] = updated
     set({ movies: next })

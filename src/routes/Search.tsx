@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { searchMovies, type TMDBMovieBrief } from '../lib/api'
 import { useMovies } from '../store/movies'
 
