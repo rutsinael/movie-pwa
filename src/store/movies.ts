@@ -36,6 +36,7 @@ export const useMovies = create<MoviesState>((set, get) => ({
       createdAt: now,
       updatedAt: now,
       tags: input.tags,
+      posterUrl: input.posterUrl ?? null,
     }
     if (!entity.title) return undefined
     const id = await db.movies.add(entity)

@@ -9,6 +9,7 @@ export interface MovieEntity {
   createdAt: string
   updatedAt: string
   tags?: string[]
+  posterUrl?: string | null
 }
 
 export interface NewMovieInput {
@@ -16,6 +17,7 @@ export interface NewMovieInput {
   status?: MovieStatus
   aiTip?: boolean
   tags?: string[]
+  posterUrl?: string | null
 }
 
 

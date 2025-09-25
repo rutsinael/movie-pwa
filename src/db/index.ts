@@ -20,6 +20,15 @@ class MovieDB extends Dexie {
     this.version(2).stores({
       movies: '++id, uuid, status, aiTip, createdAt, updatedAt, title',
     })
+
+    this.version(3).upgrade((tx) =>
+      tx.table('movies').toCollection().modify((m: any) => {
+        if (typeof m.posterUrl === 'undefined') m.posterUrl = null
+      })
+    )
+    this.version(3).stores({
+      movies: '++id, uuid, status, aiTip, createdAt, updatedAt, title, posterUrl',
+    })
   }
 }
 

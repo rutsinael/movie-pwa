@@ -50,8 +50,13 @@ export function Library() {
       ) : (
         <ul className="space-y-2">
           {movies.map((m) => (
-            <li key={m.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
-              <div>
+            <li key={m.id} className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3">
+              {m.posterUrl ? (
+                <img src={m.posterUrl} alt={m.title} className="h-16 w-12 rounded object-cover" />
+              ) : (
+                <div className="h-16 w-12 rounded bg-gray-100" />
+              )}
+              <div className="flex-1">
                 <div className="font-medium">{m.title}</div>
                 <div className="text-xs text-gray-500">{m.status === 'to_watch' ? 'Хочу' : 'Просмотрено'}</div>
               </div>

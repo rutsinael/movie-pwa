@@ -70,7 +70,7 @@ export function Search() {
                 <button
                   className="rounded bg-indigo-600 px-3 py-1 text-sm text-white"
                   onClick={async () => {
-                    const saved = await addMovie({ title: m.title, status: 'to_watch' })
+                    const saved = await addMovie({ title: m.title, status: 'to_watch', posterUrl: m.poster_url })
                     if (saved) toast.show('Добавлено в библиотеку')
                   }}
                 >
