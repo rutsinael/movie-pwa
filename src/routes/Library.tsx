@@ -5,17 +5,14 @@ import { useToast } from '../components/Toast'
 
 export function Library() {
   const { movies, updateMovie, deleteMovie } = useMovies()
-  const [roomKey, setRoomKey] = useState('')
+  const [roomKey, setRoomKey] = useState('1')
   const [syncing, setSyncing] = useState(false)
   const toast = useToast()
 
   useEffect(() => {
-    const saved = localStorage.getItem('roomKey')
-    if (saved) setRoomKey(saved)
+    setRoomKey('1')
   }, [])
-  useEffect(() => {
-    localStorage.setItem('roomKey', roomKey)
-  }, [roomKey])
+  useEffect(() => {}, [roomKey])
 
   return (
     <div className="p-4 space-y-4">

@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useMovies } from '../store/movies'
+import { pullMovies, pushMovies } from '../sync'
 
 export function Layout() {
   const location = useLocation()
@@ -12,6 +13,47 @@ export function Layout() {
   useEffect(() => {
     loadMovies()
   }, [loadMovies])
+
+  // Auto-sync: initial pull, debounced push on any local changes, periodic/visibility pull
+  useEffect(() => {
+    const getRoomKey = () => '1'
+    const doInitialPull = async () => {
+      const rk = getRoomKey()
+      if (rk) {
+        try { await pullMovies(rk) } catch {}
+      }
+    }
+    doInitialPull()
+
+    let pushTimer: number | undefined
+    const unsub = (useMovies as any).subscribe(() => {
+      const rk = getRoomKey()
+      if (!rk) return
+      if (pushTimer) window.clearTimeout(pushTimer)
+      pushTimer = window.setTimeout(async () => {
+        try { await pushMovies(rk) } catch {}
+      }, 1200)
+    })
+
+    const visibilityHandler = () => {
+      if (document.visibilityState === 'visible') {
+        const rk = getRoomKey()
+        if (rk) pullMovies(rk).catch(() => {})
+      }
+    }
+    document.addEventListener('visibilitychange', visibilityHandler)
+    const interval = window.setInterval(() => {
+      const rk = getRoomKey()
+      if (rk) pullMovies(rk).catch(() => {})
+    }, 60_000)
+
+    return () => {
+      if (unsub) unsub()
+      if (pushTimer) window.clearTimeout(pushTimer)
+      document.removeEventListener('visibilitychange', visibilityHandler)
+      window.clearInterval(interval)
+    }
+  }, [])
 
   return (
     <div className="flex h-full flex-col">
