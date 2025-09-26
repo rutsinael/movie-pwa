@@ -10,8 +10,10 @@ export function Home() {
   const [aiLoading, setAiLoading] = useState(false)
   const [aiItems, setAiItems] = useState<AISuggestion[]>([])
   const [aiNote, setAiNote] = useState('')
+  const [aiError, setAiError] = useState('')
   const toast = useToast()
   const [randomPoster, setRandomPoster] = useState<{ title: string; posterUrl: string | null } | null>(null)
+  const [tab, setTab] = useState<'to_watch' | 'watched' | 'ai'>('to_watch')
   const counts = useMemo(() => {
     const toWatch = movies.filter((m) => m.status === 'to_watch').length
     const watched = movies.filter((m) => m.status === 'watched').length
@@ -77,51 +79,78 @@ export function Home() {
       </div>
 
       <div className="flex gap-2">
-        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">📝 Хочу посмотреть</button>
-        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">✅ Просмотрено</button>
-        <button className="flex-1 rounded-lg border px-3 py-2 bg-white">🤖 ИИ</button>
-      </div>
-
-      <div className="rounded-xl border border-gray-200 p-6 text-center">
-        <div className="text-5xl mb-2">✅</div>
-        <div className="text-lg font-semibold">Ничего не просмотрено</div>
-        <div className="text-sm text-gray-600">Отметьте фильмы как просмотренные, чтобы получить рекомендации</div>
-      </div>
-
-      <div className="space-y-2">
-        <div className="text-base font-semibold">ИИ‑подборка</div>
         <button
-          className="rounded-lg bg-gray-900 text-white px-4 py-2 disabled:opacity-50"
-          disabled={aiLoading}
-          onClick={async () => {
-            setAiLoading(true)
-            try {
-              const payload = {
-                preferences: '',
-                movies: movies.map((m) => ({ title: m.title, status: m.status })),
-              }
-              const res = await getAISuggestions(payload)
-              setAiItems(res.suggestions)
-              setAiNote(res.note)
-            } catch {
-              setAiItems([])
-              setAiNote('')
-            } finally {
-              setAiLoading(false)
-            }
-          }}
+          className={`flex-1 rounded-lg border px-3 py-2 ${tab === 'to_watch' ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`}
+          onClick={() => setTab('to_watch')}
         >
-          {aiLoading ? 'Загрузка…' : 'Получить подборку'}
+          📝 Хочу посмотреть
         </button>
-        {aiNote && <div className="text-sm text-gray-600">{aiNote}</div>}
-        <ul className="space-y-2">
-          {aiItems.map((s, i) => (
-            <li key={i} className="rounded-lg border border-gray-200 p-3">
-              <div className="font-medium">{s.title}</div>
-              <div className="text-xs text-gray-500">{s.reason}</div>
-            </li>
-          ))}
-        </ul>
+        <button
+          className={`flex-1 rounded-lg border px-3 py-2 ${tab === 'watched' ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`}
+          onClick={() => setTab('watched')}
+        >
+          ✅ Просмотрено
+        </button>
+        <button
+          className={`flex-1 rounded-lg border px-3 py-2 ${tab === 'ai' ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`}
+          onClick={() => setTab('ai')}
+        >
+          🤖 ИИ
+        </button>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 p-6">
+        {tab === 'ai' ? (
+          <div className="space-y-3 text-left">
+            <button
+              className="w-full rounded-lg bg-indigo-600 text-white py-3 disabled:opacity-50"
+              disabled={aiLoading}
+              onClick={async () => {
+                setAiLoading(true)
+                try {
+                  const payload = {
+                    preferences: '',
+                    movies: movies.map((m) => ({ title: m.title, status: m.status })),
+                  }
+                  const res = await getAISuggestions(payload)
+                  setAiItems(res.suggestions)
+                  setAiNote(res.note)
+                  setAiError('')
+                } catch (err: any) {
+                  setAiItems([])
+                  setAiNote('')
+                  setAiError(err?.message || 'Ошибка ИИ')
+                } finally {
+                  setAiLoading(false)
+                }
+              }}
+            >
+              {aiLoading ? 'Загрузка…' : 'Получить подборку'}
+            </button>
+            {aiError && <div className="text-sm text-red-600">{aiError}</div>}
+            {!aiError && aiNote && <div className="text-sm text-gray-600">{aiNote}</div>}
+            <ul className="space-y-2">
+              {aiItems.map((s, i) => (
+                <li key={i} className="rounded-lg border border-gray-200 p-3">
+                  <div className="font-medium">{s.title}</div>
+                  <div className="text-xs text-gray-500">{s.reason}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : tab === 'watched' ? (
+          <div className="text-center">
+            <div className="text-5xl mb-2">✅</div>
+            <div className="text-lg font-semibold">Ничего не просмотрено</div>
+            <div className="text-sm text-gray-600">Отметьте фильмы как просмотренные, чтобы получить рекомендации</div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <div className="text-5xl mb-2">📝</div>
+            <div className="text-lg font-semibold">Список пуст</div>
+            <div className="text-sm text-gray-600">Добавьте фильмы, которые хотите посмотреть</div>
+          </div>
+        )}
       </div>
     </div>
   )

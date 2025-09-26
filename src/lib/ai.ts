@@ -10,7 +10,25 @@ export async function getAISuggestions(payload: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-  if (!res.ok) throw new Error('AI suggestions failed')
+  if (!res.ok) {
+    // Try to surface the exact error message from the server/OpenAI
+    let message = 'Ошибка ИИ: не удалось получить подборку'
+    try {
+      const err = await res.json()
+      if (typeof err?.details === 'string') {
+        try {
+          const inner = JSON.parse(err.details)
+          const innerMsg = inner?.error?.message
+          if (innerMsg) message = innerMsg
+        } catch {
+          message = err.details
+        }
+      } else if (typeof err?.error === 'string') {
+        message = err.error
+      }
+    } catch {}
+    throw new Error(message)
+  }
   return res.json()
 }
 
