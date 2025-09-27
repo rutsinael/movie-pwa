@@ -1,7 +1,6 @@
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useMovies } from '../store/movies'
-import { pullMovies, pushMovies } from '../sync'
 
 export function Layout() {
   const location = useLocation()
@@ -14,49 +13,17 @@ export function Layout() {
     loadMovies()
   }, [loadMovies])
 
-  // Auto-sync: initial pull, debounced push on any local changes, periodic/visibility pull
+  // Supabase-only: refresh on focus and periodically
   useEffect(() => {
-    const getRoomKey = () => '1'
+    // Initial load
+    loadMovies()
 
-    const doPullAndRefresh = async () => {
-      const rk = getRoomKey()
-      if (!rk) return
-      try {
-        await pullMovies(rk)
-        await loadMovies()
-      } catch {}
-    }
-
-    // Initial pull + refresh
-    doPullAndRefresh()
-
-    // Debounced push+pull on any local state change
-    let pushTimer: number | undefined
-    const unsub = (useMovies as any).subscribe(() => {
-      const rk = getRoomKey()
-      if (!rk) return
-      if (pushTimer) window.clearTimeout(pushTimer)
-      pushTimer = window.setTimeout(async () => {
-        try {
-          await pushMovies(rk)
-          await pullMovies(rk)
-          await loadMovies()
-        } catch {}
-      }, 800)
-    })
-
-    // Pull on tab focus
     const visibilityHandler = () => {
-      if (document.visibilityState === 'visible') doPullAndRefresh()
+      if (document.visibilityState === 'visible') loadMovies()
     }
     document.addEventListener('visibilitychange', visibilityHandler)
-
-    // Periodic pull
-    const interval = window.setInterval(doPullAndRefresh, 60_000)
-
+    const interval = window.setInterval(loadMovies, 60_000)
     return () => {
-      if (unsub) unsub()
-      if (pushTimer) window.clearTimeout(pushTimer)
       document.removeEventListener('visibilitychange', visibilityHandler)
       window.clearInterval(interval)
     }

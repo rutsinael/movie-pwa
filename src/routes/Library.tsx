@@ -55,17 +55,20 @@ export function Library() {
                 <button
                   className="rounded bg-gray-100 px-3 py-1 text-sm"
                   onClick={() =>
-                    updateMovie(m.id!, { status: m.status === 'to_watch' ? 'watched' : 'to_watch' })
+                    updateMovie(m.uuid, { status: m.status === 'to_watch' ? 'watched' : 'to_watch' })
                   }
                 >
                   Переключить
                 </button>
                 <button
                   className="rounded bg-red-50 px-3 py-1 text-sm text-red-600"
-                  onClick={() => {
-                    if (confirm(`Удалить «${m.title}»?`)) {
-                      deleteMovie(m.id!)
+                  onClick={async () => {
+                    if (!confirm(`Удалить «${m.title}»?`)) return
+                    try {
+                      await deleteMovie(m.uuid)
                       toast.show('Удалено')
+                    } catch (e: any) {
+                      toast.show(`Не удалось удалить: ${e?.message || 'ошибка'}`)
                     }
                   }}
                 >
