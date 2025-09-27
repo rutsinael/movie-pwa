@@ -17,35 +17,42 @@ export function Layout() {
   // Auto-sync: initial pull, debounced push on any local changes, periodic/visibility pull
   useEffect(() => {
     const getRoomKey = () => '1'
-    const doInitialPull = async () => {
-      const rk = getRoomKey()
-      if (rk) {
-        try { await pullMovies(rk) } catch {}
-      }
-    }
-    doInitialPull()
 
+    const doPullAndRefresh = async () => {
+      const rk = getRoomKey()
+      if (!rk) return
+      try {
+        await pullMovies(rk)
+        await loadMovies()
+      } catch {}
+    }
+
+    // Initial pull + refresh
+    doPullAndRefresh()
+
+    // Debounced push+pull on any local state change
     let pushTimer: number | undefined
     const unsub = (useMovies as any).subscribe(() => {
       const rk = getRoomKey()
       if (!rk) return
       if (pushTimer) window.clearTimeout(pushTimer)
       pushTimer = window.setTimeout(async () => {
-        try { await pushMovies(rk) } catch {}
-      }, 1200)
+        try {
+          await pushMovies(rk)
+          await pullMovies(rk)
+          await loadMovies()
+        } catch {}
+      }, 800)
     })
 
+    // Pull on tab focus
     const visibilityHandler = () => {
-      if (document.visibilityState === 'visible') {
-        const rk = getRoomKey()
-        if (rk) pullMovies(rk).catch(() => {})
-      }
+      if (document.visibilityState === 'visible') doPullAndRefresh()
     }
     document.addEventListener('visibilitychange', visibilityHandler)
-    const interval = window.setInterval(() => {
-      const rk = getRoomKey()
-      if (rk) pullMovies(rk).catch(() => {})
-    }, 60_000)
+
+    // Periodic pull
+    const interval = window.setInterval(doPullAndRefresh, 60_000)
 
     return () => {
       if (unsub) unsub()
@@ -53,7 +60,7 @@ export function Layout() {
       document.removeEventListener('visibilitychange', visibilityHandler)
       window.clearInterval(interval)
     }
-  }, [])
+  }, [loadMovies])
 
   return (
     <div className="flex h-full flex-col">

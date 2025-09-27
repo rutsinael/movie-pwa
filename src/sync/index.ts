@@ -21,6 +21,7 @@ export async function pullMovies(roomKey: string) {
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     tags: r.tags ?? undefined,
+    posterUrl: r.poster_url ?? null,
   }))
 
   // Last-write-wins by updatedAt
@@ -48,7 +49,29 @@ export async function pushMovies(roomKey: string) {
     created_at: m.createdAt,
     updated_at: m.updatedAt,
     tags: m.tags ?? null,
+    poster_url: m.posterUrl ?? null,
   }))
+
+  // Fetch remote UUIDs to detect deletions
+  const { data: remote, error: readErr } = await supabase
+    .from(TABLE)
+    .select('uuid')
+    .eq('room_key', roomKey)
+  if (readErr) throw readErr
+  const remoteSet = new Set((remote || []).map((r: any) => r.uuid as string))
+  const localSet = new Set(local.map((m) => m.uuid))
+  const toDelete = Array.from(remoteSet).filter((uuid) => !localSet.has(uuid))
+
+  if (toDelete.length > 0) {
+    // Delete rows that were removed locally
+    const { error: delErr } = await supabase
+      .from(TABLE)
+      .delete()
+      .eq('room_key', roomKey)
+      .in('uuid', toDelete)
+    if (delErr) throw delErr
+  }
+
   // Upsert by (room_key, uuid)
   const { error } = await supabase
     .from(TABLE)
